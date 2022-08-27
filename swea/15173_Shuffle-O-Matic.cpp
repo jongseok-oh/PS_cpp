@@ -85,12 +85,14 @@ int main(void) {
 					find = true;
 					break;
 				}
-				for (int x = 1; x < n; x++) {
-					vector<int> tempCards = tCards;
-					shuffle(x, tempCards);
-					if (dp.check(0, tempCards)) continue;
-					dp.insert(0,tempCards);
-					q.push(tempCards);
+				if(shuffleCnt < 5){
+					for (int x = 1; x < n; x++) {
+						vector<int> tempCards = tCards;
+						shuffle(x, tempCards);
+						if (dp.check(0, tempCards)) continue;
+						dp.insert(0, tempCards);
+						q.push(tempCards);
+					}
 				}
 			}
 			if (find) break;
