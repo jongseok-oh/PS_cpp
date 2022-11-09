@@ -39,6 +39,8 @@ void simulation() {
 			int y = q.front().first,
 				x = q.front().second; q.pop();
 
+			if (tmap[y][x] == 0x7fffffff) continue;
+
 			int time = tmap[y][x] >> 3,
 				value = tmap[y][x] & 7;
 
@@ -69,6 +71,8 @@ void simulation() {
 
 void chooseGreen(int green, int idx) {
 	if (!green) {
+		//for (int i = 0; i < landcnt; i++) cout << visit[i];
+		//cout << "\n";
 		simulation();
 		return;
 	}
