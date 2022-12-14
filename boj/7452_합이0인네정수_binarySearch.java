@@ -25,6 +25,7 @@ public class Main {
 			arrB[idx++] = arr[i][2] + arr[j][3];
 		}
 		
+		// arrA를 정렬하면 cache hit rate가 증가해서 속도가 빨라짐 ㄷㄷ;
         Arrays.sort(arrA);
 		Arrays.sort(arrB);
 		
