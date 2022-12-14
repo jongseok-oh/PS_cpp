@@ -25,6 +25,7 @@ public class Main {
 			arrB[idx++] = arr[i][2] + arr[j][3];
 		}
 		
+        Arrays.sort(arrA);
 		Arrays.sort(arrB);
 		
 		long ans = 0;
