@@ -1,0 +1,96 @@
+#include <iostream>
+#include <algorithm>
+
+using namespace std;
+
+int ax1, ay1, ax2, ay2, bx3, by3, bx4, by4;
+
+int main()
+{
+	ios_base::sync_with_stdio(0); cin.tie(0); cout.tie(0);
+	cin >> ax1 >> ay1 >> ax2 >> ay2 >> bx3 >> by3 >> bx4 >> by4;
+
+	int axIncrement = ax1 - ax2;
+	int bxIncrement = bx3 - bx4;
+
+	// 수직인 직선이 존재하면
+	if (!axIncrement || !bxIncrement) {
+		int aymin = min(ay1, ay2);
+		int aymax = max(ay1, ay2);
+
+		int bymin = min(by3, by4);
+		int bymax = max(by3, by4);
+
+		bool aKing = aymax >= bymax;
+		// 둘 다 수직
+		if (!axIncrement && !bxIncrement) {
+			// 평행한 직선이면
+			if (ax1 != bx3) {
+				cout << 0;
+			}
+			else {
+				if (aKing) {
+					if (aymin <= bymax) cout << 1;
+					else cout << 0;
+				}
+				else {
+					if (bymin <= aymax) cout << 1;
+					else cout << 0;
+				}
+			}
+		}
+		else {
+			
+		}
+
+
+		return 0;
+	}
+
+	double aSlope = (ax1 - ax2) / (axIncrement);
+	double bSlope = (bx3 - bx4) / (bxIncrement);
+
+	double aYIntercept = -1 * ax1 * aSlope + ay1;
+	double bYIntercept = -1 * bx3 * bSlope + by3;
+
+	int axmin = min(ax1, ax2);
+	int axmax = max(ax1, ax2);
+
+	int bxmin = min(bx3, bx4);
+	int bxmax = max(bx3, bx4);
+
+	bool aKing = axmax >= bxmax;
+
+	// 기울기 같은 직선
+	if (abs(aSlope - bSlope) <= 1e-6) {
+		// y절편 같은 직선 -> 같은 직선
+		if (abs(aYIntercept - bYIntercept) <= 1e-6) {
+			if (aKing) {
+				if (axmin <= bxmax) cout << 1;
+				else cout << 0;
+			}
+			else {
+				if (bxmin <= axmax) cout << 1;
+				else cout << 0;
+			}
+		}
+		else { // 기울기가 같은 평행한 직선
+			cout << 0;
+		}
+	}
+	else {
+		// 기울기가 다르면 직선은 무적권 교점 존재
+
+		double xmeet = (bYIntercept - aYIntercept) / (aSlope - bSlope);
+
+		// 교점이 범위 안에 존재 하는가
+		if (aKing) {
+			if (xmeet >= axmin && xmeet <= bxmax) cout << 1;
+			else cout << 0;
+		}
+		else {
+			if (xmeet >= bxmin && xmeet <= axmax) cout << 1;
+			else cout << 0;
+		}
+	}
+}
