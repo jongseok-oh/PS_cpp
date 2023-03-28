@@ -1,0 +1,196 @@
+#ifndef _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+
+#include <stdio.h>
+////////////////////////////////////////////////////////////////////////////////
+
+int arr[160000];
+
+int left, right, tJoker;
+
+struct 
+{
+	int left, right;
+	int arr[160000];
+}_sum[20][31];
+
+void init(int mJoker, int mNumbers[5])
+{
+	left = 50000, right = 50001, tJoker = mJoker;
+	for (int i = 0; i < 20; i++) for (int j = 1; j < 31; j++) {
+		_sum[i][j].left = 50000;
+		_sum[i][j].right = 50001;
+	}
+	
+	for (int i = 0; i < 5; i++) arr[right++] = mNumbers[i];
+
+	for (int start = right - 5; start < right - 3; start++) {
+		for (int jjoky = 1; jjoky < 31; jjoky++) {
+			int tsum = 0;
+			for (int i = 0; i < 4; i++) tsum += (arr[start + i] == -1 ? jjoky : arr[start + i]);
+			int& rright = _sum[tsum % 20][jjoky].right;
+			_sum[tsum % 20][jjoky].arr[rright++] = start;
+		}
+	}
+}
+
+
+void putCards(int mDir, int mNumbers[5])
+{
+	// 왼쪽에 놓기
+	if (!mDir) {
+		for (int i = 4; i >= 0; i--) arr[left--] = mNumbers[i];
+	}
+	// 오른쪽에 놓기
+	else {
+		for (int i = 0; i < 5; i++) arr[right++] = mNumbers[i];
+	}
+
+	// 조커 합 경우 계산해서 넣기
+	for (int jjoky = 1; jjoky < 31; jjoky) {
+		// 카드가 왼쪽에 놓였을 때
+		if (!mDir) {
+			int tsum = 0;
+			for (int i = 5; i > 0; i--) {
+				if (i == 5) {
+					int start = left + 5;
+					for (int j = 0; j < 4; j++)
+						tsum += (arr[start + j] == -1 ? jjoky : arr[start + j]);
+				}
+				else {
+					tsum = tsum - (arr[left + i + 4] == -1 ? jjoky : arr[left + i + 4])
+						+ (arr[left + i] == -1 ? jjoky : arr[left + i]);
+				}
+				int& lleft = _sum[tsum % 20][jjoky].left;
+				_sum[tsum % 20][jjoky].arr[lleft--] = left + i;
+			}
+		}
+		// 카드가 오른쪽에 놓였을 때
+		else {
+			int tsum = 0;
+			int start = right - 8;
+			for (int i = 0; i < 5; i++) {
+				if (i == 0) {
+					for (int j = 0; j < 4; j++)
+						tsum += (arr[start + j] == -1 ? jjoky : arr[start + j]);
+				}
+				else {
+					tsum = tsum - (arr[start + i] == -1 ? jjoky : arr[start + i])
+						+ (arr[start + i + 3] == -1 ? jjoky : arr[start + i + 3]);
+				}
+				int& rright = _sum[tsum % 20][jjoky].right;
+				_sum[tsum % 20][jjoky].arr[rright++] = start + i + 1;
+			}
+		}
+	}
+}
+
+int findNumber(int mNum, int mNth, int ret[4])
+{
+	int sum_left = _sum[mNum][tJoker].left;
+	int sum_right = _sum[mNum][tJoker].right;
+
+	if (sum_left + mNth < sum_right) {
+		int start = _sum[mNum][tJoker].arr[sum_left + mNth];
+		
+		for (int i = 0; i < 4; i++) ret[i] = arr[i + start];
+		return 1;
+	}
+	return 0;
+}
+
+void changeJoker(int mValue)
+{
+	tJoker = mValue;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+#define CMD_INIT 100
+#define CMD_PUT 200
+#define CMD_FIND 300
+#define CMD_CHANGE 400
+
+#define MAX_CARD_NUM 5
+#define MAX_RET_NUM 4
+
+static bool run()
+{
+	int query_num;
+	scanf("%d", &query_num);
+
+	int ret, ans;
+	int numbers[MAX_CARD_NUM];
+	bool ok = false;
+
+	for (int q = 0; q < query_num; q++)
+	{
+		int query;
+		scanf("%d", &query);
+
+		if (query == CMD_INIT)
+		{
+			int joker;
+			scanf("%d", &joker);
+			for (int i = 0; i < MAX_CARD_NUM; i++)
+				scanf("%d", &numbers[i]);
+			init(joker, numbers);
+			ok = true;
+		}
+		else if (query == CMD_PUT)
+		{
+			int dir;
+			scanf("%d", &dir);
+			for (int i = 0; i < MAX_CARD_NUM; i++)
+				scanf("%d", &numbers[i]);
+			putCards(dir, numbers);
+		}
+		else if (query == CMD_FIND)
+		{
+			int num, Nth;
+			int ret_numbers[MAX_RET_NUM];
+			int ans_numbers[MAX_RET_NUM];
+			scanf("%d %d %d", &num, &Nth, &ans);
+			ret = findNumber(num, Nth, ret_numbers);
+			if (ans != ret)
+			{
+				ok = false;
+				printf("#%d %s\n", q, "걍 있다 없다 틀림");
+			}
+			if (ans == 1)
+			{
+				for (int i = 0; i < MAX_RET_NUM; i++)
+				{
+					scanf("%d", &ans_numbers[i]);
+					if (ans_numbers[i] != ret_numbers[i])
+					{
+						ok = false;
+					}
+				}
+				if(!ok) printf("#%d %s\n", q, "ret 배열 틀림");
+			}
+		}
+		else if (query == CMD_CHANGE)
+		{
+			int value;
+			scanf("%d", &value);
+			changeJoker(value);
+		}
+	}
+	return ok;
+}
+int main()
+{
+	setbuf(stdout, NULL);
+	freopen("sample_input.txt", "r", stdin);
+	int T, MARK;
+	scanf("%d %d", &T, &MARK);
+
+	for (int tc = 1; tc <= T; tc++)
+	{
+		int score = run() ? MARK : 0;
+		printf("#%d %d\n", tc, score);
+	}
+	return 0;
+}
