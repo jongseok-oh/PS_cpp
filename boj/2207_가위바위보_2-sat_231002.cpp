@@ -1,0 +1,69 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <stack>
+
+using namespace std;
+
+int n, m;
+vector<int> con[20050];
+
+int convertNum(int t) {
+	if (t < 0) return -t * 2;
+	else return t * 2 - 1;
+}
+
+int order = 1;
+int pk[20050];
+
+int sccNum = 1;
+int finish[20050];
+stack<int> st;
+
+int dfs(int tNode) {
+	st.push(tNode);
+
+	int p = pk[tNode] = order++;
+	for (int& nNode : con[tNode]) {
+		if (!pk[nNode]) p = min(p, dfs(nNode));
+		else if (!finish[nNode]) p = min(p, pk[nNode]);
+	}
+
+	if (p == pk[tNode]) {
+		while (true)
+		{
+			int t = st.top(); st.pop();
+			finish[t] = sccNum;
+			if (t == tNode) break;
+		}
+		++sccNum;
+	}
+
+	return p;
+}
+
+void solve() {
+	for (int i = 1; i <= 2 * m; ++i)
+		if (!finish[i]) dfs(i);
+
+	for (int i = 1; i <= m; ++i) {
+		if (finish[2 * i - 1] == finish[2 * i]) {
+			cout << "OTL"; return;
+		}
+	}
+	cout << "^_^";
+}
+
+int main() {
+	ios_base::sync_with_stdio(0); cin.tie(0);
+	cin >> n >> m;
+	
+	int x, y;
+	for (int i = 0; i < n; ++i) {
+		cin >> x >> y;
+		con[convertNum(-x)].push_back(convertNum(y));
+		con[convertNum(-y)].push_back(convertNum(x));
+	}
+
+	solve();
+}
