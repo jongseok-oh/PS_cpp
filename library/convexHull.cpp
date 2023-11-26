@@ -19,6 +19,7 @@ double distance(Point& A, Point& B) {
 	return sqrt(dx*dx + dy * dy);
 }
 
+// 2차원 벡터 외적 -> z 벡터의 크기 반환
 ll outer(Point& O, Point& A, Point& B) {
 	ll ax = A.x - O.x, ay = A.y - O.y;
 	ll bx = B.x - O.x, by = B.y - O.y;
