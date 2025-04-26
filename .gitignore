@@ -65,3 +65,5 @@
 # build file
 main
 main.dSYM
+.DS_Store
+main.cpp
